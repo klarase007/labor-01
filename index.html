@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Labor 01 – Sicherheitsprotokoll Omega</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(circle, #17252c, #05090d 75%);
+    color: #d8faff;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.lab {
+    width: 100%;
+    max-width: 650px;
+    padding: 25px;
+    background: #0b151c;
+    border: 2px solid #31505b;
+    box-shadow: 0 0 35px #00c8ff22;
+    text-align: center;
+}
+
+h1 {
+    color: #65eaff;
+    letter-spacing: 4px;
+}
+
+.warning {
+    color: #ff4242;
+    animation: blink 1s infinite;
+    font-weight: bold;
+}
+
+.locked-title {
+    color: #ff4242;
+    letter-spacing: 3px;
+    margin-top: 25px;
+}
+
+@keyframes blink {
+    50% { opacity: 0.25; }
+}
+
+.door {
+    height: 115px;
+    margin: 25px 0;
+    border: 3px solid #506b75;
+    background: linear-gradient(90deg, #152831, #263b45, #152831);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    letter-spacing: 2px;
+    transition: 1.5s;
+    box-shadow: inset 0 0 25px #000;
+}
+
+.door.open {
+    transform: perspective(500px) rotateY(-65deg);
+    opacity: 0.3;
+    border-color: #00ff9d;
+}
+
+.panel {
+    background: #101f27;
+    border: 1px solid #35535e;
+    padding: 18px;
+    margin-top: 20px;
+}
+
+.sequence {
+    color: #8eeeff;
+    font-size: 19px;
+    line-height: 2;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 390px;
+    margin: auto;
+}
+
+.cell {
+    padding: 17px 5px;
+    background: #172c35;
+    color: #8beaff;
+    border: 1px solid #387083;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cell:hover {
+    background: #176078;
+    box-shadow: 0 0 15px #00cfff;
+}
+
+.cell.selected {
+    background: #006b72;
+    color: white;
+    border-color: #00ffcc;
+}
+
+.cell.error {
+    background: #8b1515;
+    border-color: red;
+}
+
+.status {
+    min-height: 55px;
+    margin-top: 20px;
+    font-size: 15px;
+    color: #f3dc80;
+}
+
+.progress {
+    color: #80eaff;
+    margin-top: 15px;
+}
+
+.reset {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid #55dfff;
+    color: #55dfff;
+    cursor: pointer;
+    font-family: monospace;
+}
+
+.reset:hover {
+    background: #123b49;
+}
+
+/* ERFOLGSFENSTER */
+
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.overlay.show {
+    display: flex;
+    animation: fadeIn 0.6s ease;
+}
+
+.popup {
+    width: 100%;
+    max-width: 440px;
+    padding: 35px 20px;
+    text-align: center;
+    background: #091a15;
+    border: 2px solid #00ff9d;
+    box-shadow: 0 0 35px #00ff9d66;
+    animation: popupIn 0.5s ease;
+}
+
+.success-icon {
+    font-size: 55px;
+    color: #00ff9d;
+    text-shadow: 0 0 20px #00ff9d;
+    margin-bottom: 15px;
+}
+
+.popup h2 {
+    color: #00ff9d;
+    letter-spacing: 3px;
+}
+
+.popup p {
+    color: #d8faff;
+    line-height: 1.8;
+}
+
+.popup .system {
+    color: #00ff9d;
+    margin-top: 20px;
+    animation: blink 1s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popupIn {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@media(max-width: 450px) {
+    .lab {
+        padding: 15px;
+    }
+
+    .cell {
+        padding: 15px 3px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="lab">
+
+    <h1>OMEGA LABOR</h1>
+
+    <p class="warning">
+        ⚠ SICHERHEITSPROTOKOLL AKTIV ⚠
+    </p>
+
+    <div class="door" id="door">
+        🔒 LABOR 01 – VERSCHLOSSEN
+    </div>
+
+    <div class="panel">
+
+        <h3 class="locked-title">
+            🔒 TÜR GESPERRT
+        </h3>
+
+        <p>
+            Das Sicherheitssystem wurde gesperrt.<br>
+            Gib die folgende Sequenz in der richtigen Reihenfolge ein:
+        </p>
+
+        <div class="sequence">
+            1C → E9 → 55 → BD<br>
+            3A → 9B → 67 → B9
+        </div>
+
+        <p>Wähle die acht Codes nacheinander aus:</p>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="progress" id="progress">
+            EINGABEN: 0 / 8
+        </div>
+
+        <div class="status" id="status">
+            SYSTEM BEREIT. WARTE AUF EINGABE ...
+        </div>
+
+        <button class="reset" onclick="resetGame()">
+            SYSTEM ZURÜCKSETZEN
+        </button>
+
+    </div>
+</div>
+
+<!-- ERFOLGSFENSTER -->
+
+<div class="overlay" id="successOverlay">
+
+    <div class="popup">
+
+        <div class="success-icon">✓</div>
+
+        <h2>ZUGRIFF ERLAUBT</h2>
+
+        <p>
+            Sicherheitscode erfolgreich bestätigt.
+        </p>
+
+        <p>
+            SICHERHEITSSCHLEUSE<br>
+            <strong>WIRD GEÖFFNET ...</strong>
+        </p>
+
+        <p class="system">
+            ● SYSTEMSTATUS: FREIGEGEBEN
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+
+const solution = [
+    "1C", "E9", "55", "BD",
+    "3A", "9B", "67", "B9"
+];
+
+const codes = [
+    ["A7", "F2", "1C", "D4"],
+    ["B8", "9B", "C5", "E2"],
+    ["9A", "F1", "E9", "55"],
+    ["3A", "BD", "67", "B9"]
+];
+
+let currentStep = 0;
+let unlocked = false;
+
+const grid = document.getElementById("grid");
+const statusText = document.getElementById("status");
+const progress = document.getElementById("progress");
+const overlay = document.getElementById("successOverlay");
+
+// Spielfeld erstellen
+codes.forEach(row => {
+    row.forEach(code => {
+
+        const button = document.createElement("button");
+
+        button.className = "cell";
+        button.textContent = code;
+
+        button.addEventListener("click", () => {
+            checkCode(button);
+        });
+
+        grid.appendChild(button);
+    });
+});
+
+// Code überprüfen
+function checkCode(button) {
+
+    if (unlocked) return;
+
+    const expected = solution[currentStep];
+
+    if (button.textContent === expected) {
+
+        button.classList.add("selected");
+        button.disabled = true;
+
+        currentStep++;
+
+        progress.textContent =
+            "EINGABEN: " + currentStep + " / 8";
+
+        statusText.textContent =
+            "CODE BESTÄTIGT. WEITERE EINGABE ERFORDERLICH ...";
+
+        if (currentStep === solution.length) {
+            unlockDoor();
+        }
+
+    } else {
+
+        button.classList.add("error");
+
+        statusText.textContent =
+            "⚠ FALSCHER CODE! SICHERHEITSSPERRE AKTIVIERT!";
+
+        setTimeout(resetGame, 1200);
+    }
+}
+
+// Tür öffnen und Erfolgsfenster anzeigen
+function unlockDoor() {
+
+    unlocked = true;
+
+    statusText.textContent =
+        "✓ ZUGRIFF ERLAUBT! LABOR 01 WIRD GEÖFFNET ...";
+
+    statusText.style.color = "#00ff9d";
+
+    document.getElementById("door").classList.add("open");
+
+    document.getElementById("door").textContent =
+        "✓ LABOR 01 – ZUGANG GEWÄHRT";
+
+    setTimeout(() => {
+        overlay.classList.add("show");
+    }, 1200);
+}
+
+// Spiel zurücksetzen
+function resetGame() {
+
+    currentStep = 0;
+    unlocked = false;
+
+    overlay.classList.remove("show");
+
+    document.querySelectorAll(".cell").forEach(button => {
+        button.classList.remove("selected", "error");
+        button.disabled = false;
+    });
+
+    document.getElementById("door").classList.remove("open");
+
+    document.getElementById("door").textContent =
+        "🔒 LABOR 01 – VERSCHLOSSEN";
+
+    progress.textContent = "EINGABEN: 0 / 8";
+
+    statusText.textContent =
+        "SYSTEM BEREIT. WARTE AUF EINGABE ...";
+
+    statusText.style.color = "#f3dc80";
+}
+
+</script>
+
+</body>
+</html>
